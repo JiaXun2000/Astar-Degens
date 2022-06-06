@@ -8,7 +8,7 @@ type Token @entity {
 
 type Owner @entity {
   id: ID!
-  ownedTokens: [Token!]! @derivedFrom(field: "owner")
+  ownedTokens: [String!]!
   balance: BigInt
 }
 
