@@ -17,8 +17,8 @@ processor.setDataSource({
   chain: CHAIN_NODE,
   archive: lookupArchive("astar")[0].url,
 });
-processor.setBlockRange({ from:442692} ) //1163310 442692
-processor.addPreHook({ range: { from: 442692, to: 442693 } }, async (ctx:BlockHandlerContext ) => { //0
+processor.setBlockRange({ from:442693} ) //1163310 442692
+processor.addPreHook({ range: { from: 442693, to: 442693 } }, async (ctx:BlockHandlerContext ) => { //0
 //await ctx.store.save(new Owner({ id: ctx.block.height, balance: 0n }));
   await ctx.store.save(createContractEntity());
 });
@@ -26,7 +26,7 @@ processor.addPreHook({ range: { from: 442692, to: 442693 } }, async (ctx:BlockHa
 processor.addEvmLogHandler(
   "0xd59fC6Bfd9732AB19b03664a45dC29B8421BDA9a".toLowerCase(),
   {
-    range: {from:442692},
+    range: {from:442693},
     filter: [events["Transfer(address,address,uint256)"].topic]
   },
   processTransfer
