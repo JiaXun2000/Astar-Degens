@@ -73,7 +73,6 @@ export const events = {
       }
     }
   }
-  ,
 }
 
 function getJsonAbi(): any {
