@@ -2,44 +2,9 @@
 import { assertNotNull, EvmLogHandlerContext, Store } from "@subsquid/substrate-evm-processor";
 import { ethers } from "ethers";
 import { Contract, Owner, Token, Transfer } from "./model";
-import { events, abi } from "./abi/erc721"
+import { events } from "./abi/erc721"
 
 export const CHAIN_NODE = "wss://astar.api.onfinality.io/public-ws";
-
-// First contract instantiation
-export const astarDegensContract = new ethers.Contract(
-  "0xd59fC6Bfd9732AB19b03664a45dC29B8421BDA9a".toLowerCase(),
-  abi,
-  new ethers.providers.WebSocketProvider(CHAIN_NODE)
-);
-
-export function createAstarDegenContract(): Contract {
-  return new Contract({
-    id: astarDegensContract.address,
-    name: "AstarDegens",
-    symbol: "DEGEN",
-    totalSupply: 10000n,
-  });
-}
-
-// Second contract instantiation
-export const astarCatsContract = new ethers.Contract(
-  "0x8b5d62f396Ca3C6cF19803234685e693733f9779".toLowerCase(),
-  abi,
-  new ethers.providers.WebSocketProvider(CHAIN_NODE)
-);
-
-export function createAstarCatsContract(): Contract {
-  return new Contract(
-    {
-      id: astarCatsContract.address,
-      name: "AstarCats",
-      symbol: "CAT",
-      totalSupply: 7777n,
-    }
-  )
-}
-
 
 export async function getContractEntity({
   store,
@@ -52,21 +17,10 @@ export async function getContractEntity({
   return assertNotNull(contractEntity);
 }
 
-export async function processAstarDegenTransfers(ctx: EvmLogHandlerContext): Promise<void> {
-
-  return processTransfer(ctx, astarDegensContract);
-}
-
-export async function processAstarCatsTransfers(ctx: EvmLogHandlerContext): Promise<void> {
-
-  return processTransfer(ctx, astarCatsContract);
-}
-
-
 export async function processTransfer(ctx: EvmLogHandlerContext, ethersContract: ethers.Contract): Promise<void> {
   // await ctx.store.save(new Owner({ id: "XJX"+ctx.substrate.block.height, balance: 0n }));
-  const contractLog = await getContractEntity(ctx, ethersContract, undefined);
-  console.log(`Triggered ${ contractLog.name || '' }`);
+  // const contractLog = await getContractEntity(ctx, ethersContract, undefined);
+  // console.log(`Triggered ${ contractLog.name || '' }`);
 
   // A single event in ctx
   const transfer =
