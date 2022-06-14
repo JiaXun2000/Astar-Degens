@@ -34,6 +34,9 @@ export async function getContractEntity({
 
 export async function processTransferASW(ctx: EvmLogHandlerContext): Promise<void> {
     //await ctx.store.save(new Owner({ id: "XJX"+ctx.substrate.block.height, balance: 0n }));
+
+    const contractLog = await getContractEntity(ctx);
+    console.log(`Triggered ${ contractLog.name || '' }`);
   
     //A single event in ctx
     const transfer =
