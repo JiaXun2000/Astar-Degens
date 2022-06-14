@@ -2,22 +2,31 @@ import * as ethers from "ethers";
 
 export const abi = new ethers.utils.Interface(getJsonAbi());
 
-export interface ApprovalAddressAddressUint256Event {
-  owner: string;
-  approved: string;
-  tokenId: ethers.BigNumber;
-}
-
-export interface ApprovalForAllAddressAddressBoolEvent {
-  owner: string;
+export interface ApprovalForAll0Event {
+  account: string;
   operator: string;
   approved: boolean;
 }
 
-export interface TransferAddressAddressUint256Event {
+export interface TransferBatch0Event {
+  operator: string;
   from: string;
   to: string;
-  tokenId: ethers.BigNumber;
+  ids: Array<ethers.BigNumber>;
+  values: Array<ethers.BigNumber>;
+}
+
+export interface TransferSingle0Event {
+  operator: string;
+  from: string;
+  to: string;
+  id: ethers.BigNumber;
+  value: ethers.BigNumber;
+}
+
+export interface URI0Event {
+  value: string;
+  id: ethers.BigNumber;
 }
 
 export interface EvmEvent {
@@ -26,50 +35,69 @@ export interface EvmEvent {
 }
 
 export const events = {
-  "Approval(address,address,uint256)":  {
-    topic: abi.getEventTopic("Approval(address,address,uint256)"),
-    decode(data: EvmEvent): ApprovalAddressAddressUint256Event {
-      const result = abi.decodeEventLog(
-        abi.getEvent("Approval(address,address,uint256)"),
-        data.data || "",
-        data.topics
-      );
-      return  {
-        owner: result[0],
-        approved: result[1],
-        tokenId: result[2],
-      }
-    }
-  }
-  ,
   "ApprovalForAll(address,address,bool)":  {
     topic: abi.getEventTopic("ApprovalForAll(address,address,bool)"),
-    decode(data: EvmEvent): ApprovalForAllAddressAddressBoolEvent {
+    decode(data: EvmEvent): ApprovalForAll0Event {
       const result = abi.decodeEventLog(
         abi.getEvent("ApprovalForAll(address,address,bool)"),
         data.data || "",
         data.topics
       );
       return  {
-        owner: result[0],
+        account: result[0],
         operator: result[1],
         approved: result[2],
       }
     }
   }
   ,
-  "Transfer(address,address,uint256)":  {
-    topic: abi.getEventTopic("Transfer(address,address,uint256)"),
-    decode(data: EvmEvent): TransferAddressAddressUint256Event {
+  "TransferBatch(address,address,address,uint256[],uint256[])":  {
+    topic: abi.getEventTopic("TransferBatch(address,address,address,uint256[],uint256[])"),
+    decode(data: EvmEvent): TransferBatch0Event {
       const result = abi.decodeEventLog(
-        abi.getEvent("Transfer(address,address,uint256)"),
+        abi.getEvent("TransferBatch(address,address,address,uint256[],uint256[])"),
         data.data || "",
         data.topics
       );
       return  {
-        from: result[0],
-        to: result[1],
-        tokenId: result[2],
+        operator: result[0],
+        from: result[1],
+        to: result[2],
+        ids: result[3],
+        values: result[4],
+      }
+    }
+  }
+  ,
+  "TransferSingle(address,address,address,uint256,uint256)":  {
+    topic: abi.getEventTopic("TransferSingle(address,address,address,uint256,uint256)"),
+    decode(data: EvmEvent): TransferSingle0Event {
+      const result = abi.decodeEventLog(
+        abi.getEvent("TransferSingle(address,address,address,uint256,uint256)"),
+        data.data || "",
+        data.topics
+      );
+      return  {
+        operator: result[0],
+        from: result[1],
+        to: result[2],
+        id: result[3],
+        value: result[4],
+      }
+    }
+  }
+  ,
+  "URI(string,uint256)":  {
+    topic: abi.getEventTopic("URI(string,uint256)"),
+    decode(data: EvmEvent): URI0Event {
+      const result = abi.decodeEventLog(
+        abi.getEvent("URI(string,uint256)"),
+        data.data || "",
+        data.topics
+      );
+      return  {
+        value: result[0],
+        id: result[1],
       }
     }
   }
@@ -79,58 +107,12 @@ export const events = {
 function getJsonAbi(): any {
   return [
     {
-      "inputs": [
-        {
-          "internalType": "string",
-          "name": "name",
-          "type": "string"
-        },
-        {
-          "internalType": "string",
-          "name": "symbol",
-          "type": "string"
-        },
-        {
-          "internalType": "string",
-          "name": "baseURI",
-          "type": "string"
-        }
-      ],
-      "stateMutability": "nonpayable",
-      "type": "constructor"
-    },
-    {
       "anonymous": false,
       "inputs": [
         {
           "indexed": true,
           "internalType": "address",
-          "name": "owner",
-          "type": "address"
-        },
-        {
-          "indexed": true,
-          "internalType": "address",
-          "name": "approved",
-          "type": "address"
-        },
-        {
-          "indexed": true,
-          "internalType": "uint256",
-          "name": "tokenId",
-          "type": "uint256"
-        }
-      ],
-      "name": "Approval",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": true,
-          "internalType": "address",
-          "name": "owner",
+          "name": "account",
           "type": "address"
         },
         {
@@ -155,6 +137,12 @@ function getJsonAbi(): any {
         {
           "indexed": true,
           "internalType": "address",
+          "name": "operator",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
           "name": "from",
           "type": "address"
         },
@@ -165,39 +153,88 @@ function getJsonAbi(): any {
           "type": "address"
         },
         {
+          "indexed": false,
+          "internalType": "uint256[]",
+          "name": "ids",
+          "type": "uint256[]"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256[]",
+          "name": "values",
+          "type": "uint256[]"
+        }
+      ],
+      "name": "TransferBatch",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
           "indexed": true,
+          "internalType": "address",
+          "name": "operator",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "from",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "to",
+          "type": "address"
+        },
+        {
+          "indexed": false,
           "internalType": "uint256",
-          "name": "tokenId",
+          "name": "id",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "value",
           "type": "uint256"
         }
       ],
-      "name": "Transfer",
+      "name": "TransferSingle",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "value",
+          "type": "string"
+        },
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "id",
+          "type": "uint256"
+        }
+      ],
+      "name": "URI",
       "type": "event"
     },
     {
       "inputs": [
         {
           "internalType": "address",
-          "name": "to",
+          "name": "account",
           "type": "address"
         },
         {
           "internalType": "uint256",
-          "name": "tokenId",
+          "name": "id",
           "type": "uint256"
-        }
-      ],
-      "name": "approve",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "owner",
-          "type": "address"
         }
       ],
       "name": "balanceOf",
@@ -212,32 +249,24 @@ function getJsonAbi(): any {
       "type": "function"
     },
     {
-      "inputs": [],
-      "name": "baseURI",
-      "outputs": [
-        {
-          "internalType": "string",
-          "name": "",
-          "type": "string"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
       "inputs": [
         {
-          "internalType": "uint256",
-          "name": "tokenId",
-          "type": "uint256"
+          "internalType": "address[]",
+          "name": "accounts",
+          "type": "address[]"
+        },
+        {
+          "internalType": "uint256[]",
+          "name": "ids",
+          "type": "uint256[]"
         }
       ],
-      "name": "getApproved",
+      "name": "balanceOfBatch",
       "outputs": [
         {
-          "internalType": "address",
+          "internalType": "uint256[]",
           "name": "",
-          "type": "address"
+          "type": "uint256[]"
         }
       ],
       "stateMutability": "view",
@@ -247,7 +276,7 @@ function getJsonAbi(): any {
       "inputs": [
         {
           "internalType": "address",
-          "name": "owner",
+          "name": "account",
           "type": "address"
         },
         {
@@ -268,38 +297,6 @@ function getJsonAbi(): any {
       "type": "function"
     },
     {
-      "inputs": [],
-      "name": "name",
-      "outputs": [
-        {
-          "internalType": "string",
-          "name": "",
-          "type": "string"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "tokenId",
-          "type": "uint256"
-        }
-      ],
-      "name": "ownerOf",
-      "outputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
       "inputs": [
         {
           "internalType": "address",
@@ -312,12 +309,22 @@ function getJsonAbi(): any {
           "type": "address"
         },
         {
-          "internalType": "uint256",
-          "name": "tokenId",
-          "type": "uint256"
+          "internalType": "uint256[]",
+          "name": "ids",
+          "type": "uint256[]"
+        },
+        {
+          "internalType": "uint256[]",
+          "name": "amounts",
+          "type": "uint256[]"
+        },
+        {
+          "internalType": "bytes",
+          "name": "data",
+          "type": "bytes"
         }
       ],
-      "name": "safeTransferFrom",
+      "name": "safeBatchTransferFrom",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -336,12 +343,17 @@ function getJsonAbi(): any {
         },
         {
           "internalType": "uint256",
-          "name": "tokenId",
+          "name": "id",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amount",
           "type": "uint256"
         },
         {
           "internalType": "bytes",
-          "name": "_data",
+          "name": "data",
           "type": "bytes"
         }
       ],
@@ -388,8 +400,14 @@ function getJsonAbi(): any {
       "type": "function"
     },
     {
-      "inputs": [],
-      "name": "symbol",
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "id",
+          "type": "uint256"
+        }
+      ],
+      "name": "uri",
       "outputs": [
         {
           "internalType": "string",
@@ -398,104 +416,6 @@ function getJsonAbi(): any {
         }
       ],
       "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "index",
-          "type": "uint256"
-        }
-      ],
-      "name": "tokenByIndex",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "owner",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "index",
-          "type": "uint256"
-        }
-      ],
-      "name": "tokenOfOwnerByIndex",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "tokenId",
-          "type": "uint256"
-        }
-      ],
-      "name": "tokenURI",
-      "outputs": [
-        {
-          "internalType": "string",
-          "name": "",
-          "type": "string"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "totalSupply",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "from",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
-          "name": "to",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "tokenId",
-          "type": "uint256"
-        }
-      ],
-      "name": "transferFrom",
-      "outputs": [],
-      "stateMutability": "nonpayable",
       "type": "function"
     }
   ]
